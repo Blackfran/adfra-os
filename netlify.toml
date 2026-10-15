@@ -14,7 +14,7 @@
 # Proxy: el teléfono llama a /api → Render
 [[redirects]]
   from = "/api/*"
-  to = "https://CAMBIA-ESTO.onrender.com/api/:splat"
+  to = "https://adfra-os.onrender.com/api/:splat"
   status = 200
   force = true
 
