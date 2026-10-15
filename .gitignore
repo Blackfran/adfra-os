@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.venv/
+backend/.venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+*.db
+.DS_Store
+frontend/dev-dist/
+*.egg-info/
+.pytest_cache/
+.idea/
+.vscode/
