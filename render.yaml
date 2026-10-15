@@ -1,0 +1,21 @@
+# AdFra Ges — API gratis en Render
+services:
+  - type: web
+    name: adfra-ges-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: APP_NAME
+        value: AdFra Ges
+      - key: AUTH_ENABLED
+        value: "true"
+      - key: AUTH_TOKEN_DAYS
+        value: "14"
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      # Estas las pegas tú en el panel de Render (no las subas a Git):
+      # DATABASE_URL, APP_USERNAME, APP_PASSWORD, AUTH_SECRET, CORS_ORIGINS

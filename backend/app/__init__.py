@@ -1,1 +1,1 @@
-"""AdFra OS API."""
+"""AdFra Ges API."""

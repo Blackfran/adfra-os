@@ -1,0 +1,12 @@
+**/node_modules
+**/__pycache__
+**/*.pyc
+**/.venv
+**/venv
+**/dist
+**/.env
+**/.git
+**/agent-transcripts
+**/*.md
+frontend/dev-dist
+backend/adfra.db

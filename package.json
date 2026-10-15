@@ -2,7 +2,7 @@
   "name": "adfra-os",
   "version": "1.1.0",
   "private": true,
-  "description": "AdFra OS — Personal ERP & Operating System",
+  "description": "AdFra Ges — sistema de gestión personal",
   "scripts": {
     "dev:web": "npm --prefix frontend run dev",
     "dev:api": "backend\\.venv\\Scripts\\uvicorn.exe app.main:app --reload --host 127.0.0.1 --port 8000 --app-dir backend",

@@ -11,40 +11,42 @@ export function FabCapture() {
   }
 
   return (
-    <div className="fixed bottom-20 right-4 z-50 md:bottom-8 md:right-8">
+    <div className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-3 z-50 sm:right-4 md:bottom-8 md:right-8">
       {open && (
         <div className="mb-3 flex flex-col items-end gap-2">
-          <button
-            type="button"
-            onClick={() => go('/transacciones/nuevo?tipo=gasto')}
-            className="rounded-full bg-expense px-3 py-2 text-xs font-semibold text-ink shadow-lg"
-          >
-            Gasto
-          </button>
-          <button
-            type="button"
-            onClick={() => go('/transacciones/nuevo?tipo=ingreso')}
-            className="rounded-full bg-income px-3 py-2 text-xs font-semibold text-ink shadow-lg"
-          >
-            Ingreso
-          </button>
-          <button
-            type="button"
-            onClick={() => go('/bitacora/nuevo')}
-            className="rounded-full bg-amber-400 px-3 py-2 text-xs font-semibold text-ink shadow-lg"
-          >
-            Nota
-          </button>
+          <Action label="Gasto" className="bg-expense text-ink" onClick={() => go('/transacciones/nuevo?tipo=gasto')} />
+          <Action label="Ingreso" className="bg-income text-ink" onClick={() => go('/transacciones/nuevo?tipo=ingreso')} />
+          <Action label="Nota" className="bg-accent text-ink" onClick={() => go('/bitacora/nuevo')} />
         </div>
       )}
       <button
         type="button"
         aria-label="Captura rápida"
         onClick={() => setOpen((v) => !v)}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-2xl font-light text-ink shadow-[0_8px_24px_rgba(56,189,248,0.35)] transition active:scale-95"
+        className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-accent text-3xl font-light text-ink shadow-lg shadow-accent/25 transition active:scale-95"
       >
         {open ? '×' : '+'}
       </button>
     </div>
+  )
+}
+
+function Action({
+  label,
+  className,
+  onClick,
+}: {
+  label: string
+  className: string
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`min-h-11 rounded-2xl px-4 text-sm font-semibold shadow-md ${className}`}
+    >
+      {label}
+    </button>
   )
 }

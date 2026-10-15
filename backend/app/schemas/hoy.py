@@ -3,6 +3,8 @@ from decimal import Decimal
 
 from pydantic import BaseModel
 
+from app.schemas.ops import InsightOut, RecurrenteOut
+
 
 class AgendaEventoOut(BaseModel):
     id: int
@@ -30,9 +32,27 @@ class BalanceDia(BaseModel):
     moneda: str
 
 
+class BalanceMes(BaseModel):
+    ingresos: Decimal
+    gastos: Decimal
+    neto: Decimal
+    moneda: str
+
+
+class Liquidez(BaseModel):
+    total_usd: Decimal
+    cuentas_activas: int
+
+
 class VistaHoyResponse(BaseModel):
     fecha: date
     eventos_del_dia: list[AgendaEventoOut]
     tareas_pendientes: list[AgendaEventoOut]
     hitos_por_cobrar_hoy: list[HitoPorCobrar]
+    hitos_vencidos: list[HitoPorCobrar]
     balance_dia: BalanceDia
+    balance_mes: BalanceMes
+    liquidez: Liquidez
+    recurrentes_proximos: list[RecurrenteOut]
+    insights: list[InsightOut]
+    por_cobrar_total: Decimal

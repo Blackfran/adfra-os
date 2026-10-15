@@ -11,15 +11,15 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons/*.png'],
       manifest: {
-        name: 'AdFra OS Personal ERP',
-        short_name: 'AdFra OS',
+        name: 'AdFra Ges',
+        short_name: 'AdFra Ges',
         description:
-          'Sistema unificado de control financiero, proyectos freelance, wishlist y productividad diaria.',
+          'Sistema de gestión personal para finanzas, proyectos freelance, wishlist y productividad diaria.',
         start_url: '/?source=pwa',
         display: 'standalone',
         orientation: 'any',
-        background_color: '#0F172A',
-        theme_color: '#0F172A',
+        background_color: '#faf8fc',
+        theme_color: '#6d28d9',
         categories: ['finance', 'productivity', 'business'],
         lang: 'es',
         shortcuts: [

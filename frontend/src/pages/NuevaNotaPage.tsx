@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { api } from '../lib/api'
 import { enqueueMutation, flushQueue } from '../lib/offlineQueue'
-import { syncMutations } from '../lib/api'
 
 export function NuevaNotaPage() {
   const [titulo, setTitulo] = useState('')
@@ -29,11 +29,11 @@ export function NuevaNotaPage() {
         await enqueueMutation({ entity: 'nota', payload })
         setStatus('Nota en cola offline')
       } else {
-        await syncMutations([{ entity: 'nota', payload }])
+        await api.createNota(payload)
         await flushQueue()
         setStatus('Nota guardada')
       }
-      setTimeout(() => navigate('/'), 500)
+      setTimeout(() => navigate('/bitacora'), 400)
     } catch (err) {
       await enqueueMutation({ entity: 'nota', payload })
       setStatus(`Guardado local: ${(err as Error).message}`)
@@ -42,10 +42,10 @@ export function NuevaNotaPage() {
 
   return (
     <div className="mx-auto max-w-md space-y-4">
-      <Link to="/" className="text-sm text-accent">
+      <Link to="/bitacora" className="text-sm text-accent">
         ← Volver
       </Link>
-      <h1 className="font-display text-2xl font-semibold text-white">Nota rápida</h1>
+      <h1 className="page-title">Nota rápida</h1>
       <form onSubmit={onSubmit} className="space-y-3 rounded-2xl border border-line/80 bg-panel/80 p-4">
         <input
           value={titulo}

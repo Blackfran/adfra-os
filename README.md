@@ -1,39 +1,23 @@
-# AdFra OS
+# AdFra Ges
 
-Personal ERP & Operating System — PWA modular para finanzas multi-moneda, proyectos freelance, wishlist y productividad diaria.
+Sistema de gestión personal — PWA para finanzas multi-moneda, proyectos freelance, wishlist, agenda y bitácora.
 
-**Stack (fase 1):** React + Vite + Tailwind + Workbox PWA · FastAPI · PostgreSQL (SQLite local por defecto)
+**Stack:** React + Vite + Tailwind + Workbox · FastAPI · Supabase (PostgreSQL)
 
-## Estructura
-
-```
-frontend/     PWA (App Shell, Vista Hoy, FAB, cola offline IndexedDB)
-backend/      FastAPI + SQLAlchemy + schema SQL PostgreSQL
-```
-
-## Arranque rápido
+## Arranque
 
 ### Backend
 
 ```bash
 cd backend
 python -m venv .venv
-# Windows:
-.venv\Scripts\activate
+.venv\Scripts\activate   # Windows
 pip install -r requirements.txt
+# Configura DATABASE_URL en backend/.env (ver .env.example)
 uvicorn app.main:app --reload --port 8000
 ```
 
-API docs: http://127.0.0.1:8000/docs
-
-Por defecto usa `sqlite:///./adfra.db`. Para PostgreSQL:
-
-```bash
-# .env
-DATABASE_URL=postgresql+psycopg2://user:pass@localhost:5432/adfra_os
-```
-
-Aplica el DDL de referencia en `backend/sql/001_schema.sql`.
+Docs: http://127.0.0.1:8000/docs
 
 ### Frontend
 
@@ -43,19 +27,23 @@ npm install
 npm run dev
 ```
 
-App: http://localhost:5173 (proxy `/api` → `:8000`)
+App: http://localhost:5173
 
-## Endpoints fase 1
+## Módulos
 
-| Método | Ruta | Función |
-|--------|------|---------|
-| GET | `/api/hoy` | `obtener_vista_hoy` |
-| POST | `/api/transacciones` | `registrar_transaccion` |
-| GET | `/api/flujo-caja` | `calcular_flujo_caja` |
-| POST | `/api/sync` | `sincronizar_cola_offline` |
+| Ruta | Función |
+|------|---------|
+| `/` | Vista Hoy — agenda, cobros, saldo del día |
+| `/finanzas` | Libro diario, flujo de caja, desglose |
+| `/proyectos` | Pipeline + hitos + liquidación → ingreso |
+| `/agenda` | Eventos, completar, snooze 15/30/60 |
+| `/wishlist` | Metas de ahorro, aportes, comprar |
+| `/bitacora` | Notas + hashtags + búsqueda |
 
-## PWA
+## API principal
 
-- Manifest generado por `vite-plugin-pwa` (nombre AdFra OS, shortcuts gasto/ingreso/nota)
-- Cache-First assets estáticos · Stale-While-Revalidate para `/api/*`
-- Cola IndexedDB `pending_sync_queue` + flush en evento `online` / Background Sync tag `sync-mutations-queue`
+- `GET /api/hoy` · `POST /api/transacciones` · `GET /api/flujo-caja`
+- `GET/POST /api/proyectos` · `POST /api/hitos/{id}/liquidar`
+- `GET/POST /api/wishlist` · `POST /api/wishlist/{id}/aporte|comprar`
+- `GET/POST /api/agenda` · `POST /api/agenda/{id}/snooze`
+- `GET/POST /api/bitacora` · `GET /api/search` · `POST /api/sync`

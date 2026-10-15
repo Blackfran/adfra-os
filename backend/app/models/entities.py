@@ -151,3 +151,65 @@ class DispositivoPush(Base):
     auth_key: Mapped[str] = mapped_column(Text, nullable=False)
     dispositivo_info: Mapped[str | None] = mapped_column(String(100))
     creado_el: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class Cuenta(Base):
+    __tablename__ = "cuentas"
+
+    id: Mapped[int] = mapped_column(PK, primary_key=True, autoincrement=True)
+    nombre: Mapped[str] = mapped_column(String(80), nullable=False)
+    tipo: Mapped[str] = mapped_column(String(30), default="efectivo")  # efectivo, banco, billetera, crypto
+    moneda_id: Mapped[str] = mapped_column(String(3), ForeignKey("monedas.id"), nullable=False)
+    saldo: Mapped[Decimal] = mapped_column(Numeric(14, 2), default=Decimal("0.00"))
+    activa: Mapped[bool] = mapped_column(Boolean, default=True)
+    banco: Mapped[str | None] = mapped_column(String(120))
+    numero_cuenta: Mapped[str | None] = mapped_column(String(64))
+    tipo_cuenta: Mapped[str | None] = mapped_column(String(40))  # ahorro, corriente, etc.
+    titular: Mapped[str | None] = mapped_column(String(150))
+    documento_id: Mapped[str | None] = mapped_column(String(40))  # cédula / RIF
+    telefono_pago: Mapped[str | None] = mapped_column(String(30))  # pago móvil
+    email_pago: Mapped[str | None] = mapped_column(String(120))
+    notas: Mapped[str | None] = mapped_column(Text)
+    creado_el: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class GastoRecurrente(Base):
+    __tablename__ = "gastos_recurrentes"
+
+    id: Mapped[int] = mapped_column(PK, primary_key=True, autoincrement=True)
+    nombre: Mapped[str] = mapped_column(String(120), nullable=False)
+    monto: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    moneda_id: Mapped[str] = mapped_column(String(3), ForeignKey("monedas.id"), nullable=False)
+    categoria_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("categorias_financieras.id"))
+    dia_cobro: Mapped[int] = mapped_column(Integer, default=1)  # 1-28
+    activo: Mapped[bool] = mapped_column(Boolean, default=True)
+    proximo_pago: Mapped[date | None] = mapped_column(Date)
+    notas: Mapped[str | None] = mapped_column(Text)
+
+
+class PresupuestoMensual(Base):
+    __tablename__ = "presupuestos_mensuales"
+    __table_args__ = (UniqueConstraint("anio", "mes", "categoria_id", name="uq_presupuesto_mes_cat"),)
+
+    id: Mapped[int] = mapped_column(PK, primary_key=True, autoincrement=True)
+    anio: Mapped[int] = mapped_column(Integer, nullable=False)
+    mes: Mapped[int] = mapped_column(Integer, nullable=False)
+    categoria_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("categorias_financieras.id"))
+    limite: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    moneda_id: Mapped[str] = mapped_column(String(3), ForeignKey("monedas.id"), default="USD")
+
+
+class IngresoRecurrente(Base):
+    __tablename__ = "ingresos_recurrentes"
+
+    id: Mapped[int] = mapped_column(PK, primary_key=True, autoincrement=True)
+    nombre: Mapped[str] = mapped_column(String(120), nullable=False)
+    monto: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    moneda_id: Mapped[str] = mapped_column(String(3), ForeignKey("monedas.id"), nullable=False)
+    categoria_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("categorias_financieras.id"))
+    dia_cobro: Mapped[int] = mapped_column(Integer, default=1)
+    activo: Mapped[bool] = mapped_column(Boolean, default=True)
+    proximo_cobro: Mapped[date | None] = mapped_column(Date)
+    notas: Mapped[str | None] = mapped_column(Text)
+
+

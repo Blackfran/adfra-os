@@ -7,6 +7,8 @@ __pycache__/
 .env
 .env.*
 !.env.example
+!backend/.env.example
+!.env.example
 *.db
 .DS_Store
 frontend/dev-dist/

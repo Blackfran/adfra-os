@@ -6,11 +6,11 @@ import { Header } from './Header'
 
 export function AppShell() {
   return (
-    <div className="mx-auto flex min-h-full max-w-lg flex-col md:max-w-5xl">
+    <div className="mx-auto flex min-h-full w-full max-w-[100vw] flex-col md:max-w-6xl">
       <Header />
-      <div className="flex flex-1">
+      <div className="flex min-w-0 flex-1">
         <DesktopSidebar />
-        <main className="flex-1 px-4 pb-28 pt-3 md:px-6 md:pb-8">
+        <main className="animate-page safe-bottom min-w-0 flex-1 overflow-x-hidden px-3 pt-3 sm:px-4 md:px-6 md:pb-10">
           <Outlet />
         </main>
       </div>

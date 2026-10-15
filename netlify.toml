@@ -1,0 +1,25 @@
+# AdFra Ges — frontend gratis en Netlify
+# 1) Despliega la API en Render
+# 2) Cambia la URL de abajo por tu API real (ej. https://adfra-ges-api.onrender.com)
+# 3) Despliega este repo en Netlify
+
+[build]
+  base = "frontend"
+  command = "npm ci && npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Proxy: el teléfono llama a /api → Render
+[[redirects]]
+  from = "/api/*"
+  to = "https://CAMBIA-ESTO.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+# SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

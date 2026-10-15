@@ -1,11 +1,9 @@
-import { useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { createTransaccion } from '../lib/api'
+import { api, createTransaccion } from '../lib/api'
+import { cacheInvalidate } from '../lib/cache'
 import { enqueueMutation, flushQueue } from '../lib/offlineQueue'
-
-function uuid() {
-  return crypto.randomUUID()
-}
+import type { Categoria } from '../types/api'
 
 export function NuevaTransaccionPage() {
   const [params] = useSearchParams()
@@ -14,10 +12,17 @@ export function NuevaTransaccionPage() {
   const [monto, setMonto] = useState('')
   const [nota, setNota] = useState('')
   const [moneda, setMoneda] = useState('USD')
+  const [categoriaId, setCategoriaId] = useState<number | ''>('')
+  const [categorias, setCategorias] = useState<Categoria[]>([])
   const [status, setStatus] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const navigate = useNavigate()
 
+  useEffect(() => {
+    api.categorias().then(setCategorias).catch(() => undefined)
+  }, [])
+
+  const cats = useMemo(() => categorias.filter((c) => c.tipo === tipo), [categorias, tipo])
   const title = useMemo(() => (tipo === 'gasto' ? 'Registrar gasto' : 'Registrar ingreso'), [tipo])
 
   async function onSubmit(e: FormEvent) {
@@ -29,13 +34,14 @@ export function NuevaTransaccionPage() {
     }
 
     const payload = {
-      uuid_sync: uuid(),
+      uuid_sync: crypto.randomUUID(),
       tipo,
       monto: amount,
       moneda_id: moneda,
       tasa_cambio: 1,
       nota: nota || undefined,
       fecha_transaccion: new Date().toISOString().slice(0, 10),
+      categoria_id: categoriaId === '' ? null : Number(categoriaId),
     }
 
     setSaving(true)
@@ -47,9 +53,10 @@ export function NuevaTransaccionPage() {
       } else {
         await createTransaccion(payload)
         await flushQueue()
+        await cacheInvalidate('')
         setStatus('Transacción registrada')
       }
-      setTimeout(() => navigate('/'), 600)
+      setTimeout(() => navigate('/finanzas'), 500)
     } catch (err) {
       await enqueueMutation({ entity: 'transaccion', payload })
       setStatus(`Cola local: ${(err as Error).message}`)
@@ -60,10 +67,10 @@ export function NuevaTransaccionPage() {
 
   return (
     <div className="mx-auto max-w-md space-y-4">
-      <Link to="/" className="text-sm text-accent">
+      <Link to="/finanzas" className="text-sm text-accent">
         ← Volver
       </Link>
-      <h1 className="font-display text-2xl font-semibold text-white">{title}</h1>
+      <h1 className="page-title">{title}</h1>
 
       <form onSubmit={onSubmit} className="space-y-3 rounded-2xl border border-line/80 bg-panel/80 p-4">
         <div className="grid grid-cols-2 gap-2">
@@ -97,6 +104,22 @@ export function NuevaTransaccionPage() {
             placeholder="0.00"
             autoFocus
           />
+        </label>
+
+        <label className="block text-sm">
+          <span className="text-mist">Categoría</span>
+          <select
+            value={categoriaId}
+            onChange={(e) => setCategoriaId(e.target.value ? Number(e.target.value) : '')}
+            className="mt-1 w-full rounded-lg border border-line bg-ink px-3 py-2 text-foam outline-none focus:border-accent"
+          >
+            <option value="">Sin categoría</option>
+            {cats.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.nombre}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label className="block text-sm">

@@ -1,92 +1,103 @@
-import { useEffect, useState } from 'react'
-import { fetchVistaHoy } from '../lib/api'
-import type { VistaHoy } from '../types/api'
-
-function money(value: string | number, currency = 'USD') {
-  const n = typeof value === 'string' ? Number(value) : value
-  return new Intl.NumberFormat('es-VE', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 2,
-  }).format(Number.isFinite(n) ? n : 0)
-}
+import { type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
+import { api } from '../lib/api'
+import { useAuth } from '../lib/auth'
+import { useCachedQuery } from '../lib/cache'
+import { money } from '../lib/money'
 
 function timeLabel(iso: string) {
   return new Date(iso).toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' })
 }
 
+const severity = {
+  critico: 'border-expense/30 bg-expense-soft text-expense',
+  aviso: 'border-warn/30 bg-warn-soft text-warn',
+  info: 'border-accent/25 bg-accent-soft text-accent',
+} as const
+
 export function HoyPage() {
-  const [data, setData] = useState<VistaHoy | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { user } = useAuth()
+  const { data, loading, error, fromCache, refreshing } = useCachedQuery('hoy', () => api.hoy(), [])
 
-  useEffect(() => {
-    let alive = true
-    setLoading(true)
-    fetchVistaHoy()
-      .then((res) => {
-        if (alive) {
-          setData(res)
-          setError(null)
-        }
-      })
-      .catch((err: Error) => {
-        if (alive) setError(err.message || 'No se pudo cargar la vista de hoy')
-      })
-      .finally(() => {
-        if (alive) setLoading(false)
-      })
-    return () => {
-      alive = false
-    }
-  }, [])
-
-  if (loading) {
-    return <p className="text-sm text-mist">Cargando consola matutina…</p>
+  if (loading && !data) {
+    return <p className="py-10 text-center text-sm font-medium text-mist">Cargando tu día…</p>
   }
-
-  if (error || !data) {
+  if (error && !data) {
     return (
-      <div className="rounded-2xl border border-expense/40 bg-expense/10 p-4 text-sm text-expense">
-        {error || 'Sin datos'}
-        <p className="mt-2 text-mist">Asegúrate de que la API esté en :8000</p>
+      <div className="native-card border-expense/30 bg-expense-soft p-4 text-sm text-expense">
+        {error}
       </div>
     )
   }
+  if (!data) return null
 
-  const { balance_dia: bal } = data
+  const bal = data.balance_dia
+  const mes = data.balance_mes
 
   return (
-    <div className="space-y-5">
+    <div className="page space-y-5">
       <section>
-        <h1 className="font-display text-2xl font-semibold text-white">Vista Hoy</h1>
-        <p className="mt-1 text-sm text-mist">Agenda, cobros del día y saldo circulante.</p>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent">Hoy</p>
+        <h1 className="page-title mt-1">{user ? `Hola ${user}` : '¿Qué hay que atender?'}</h1>
+        <p className="mt-1 text-sm text-mist">
+          Alertas, cobros y foco del día
+          {fromCache && refreshing ? ' · actualizando…' : ''}
+        </p>
+      </section>
+
+      <section className="metric-grid cols-4">
+        <Tile label="Liquidez" value={money(data.liquidez.total_usd)} hint={`${data.liquidez.cuentas_activas} cuentas`} />
+        <Tile label="Por cobrar" value={money(data.por_cobrar_total)} hint="Clientes" tone="text-income" />
+        <Tile label="Hoy" value={money(bal.neto)} tone={Number(bal.neto) >= 0 ? 'text-income' : 'text-expense'} />
+        <Tile label="Este mes" value={money(mes.neto)} tone={Number(mes.neto) >= 0 ? 'text-accent' : 'text-expense'} />
       </section>
 
       <section className="grid grid-cols-3 gap-2">
-        <BalanceTile label="Ingresos" value={money(bal.ingresos)} tone="text-income" />
-        <BalanceTile label="Gastos" value={money(bal.gastos)} tone="text-expense" />
-        <BalanceTile label="Neto" value={money(bal.neto)} tone="text-accent" />
+        <Quick to="/transacciones/nuevo?tipo=gasto" label="Gasto" tone="bg-expense-soft text-expense" />
+        <Quick to="/transacciones/nuevo?tipo=ingreso" label="Ingreso" tone="bg-income-soft text-income" />
+        <Quick to="/reporte" label="Reporte" tone="bg-accent-soft text-accent" />
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-mist">Por cobrar hoy</h2>
+        <SectionTitle>Te conviene ver</SectionTitle>
+        {data.insights.map((i) => (
+          <Link key={i.codigo + i.titulo} to={i.accion_url || '/'} className={`block rounded-2xl border px-3.5 py-3.5 ${severity[i.severidad]}`}>
+            <p className="text-sm font-bold">{i.titulo}</p>
+            <p className="mt-0.5 text-xs opacity-90">{i.detalle}</p>
+          </Link>
+        ))}
+      </section>
+
+      {data.hitos_vencidos.length > 0 && (
+        <section className="space-y-2">
+          <SectionTitle tone="text-expense">Cobros atrasados</SectionTitle>
+          {data.hitos_vencidos.map((h) => (
+            <Link key={h.id} to="/proyectos" className="native-card block px-3.5 py-3.5">
+              <div className="row-between">
+                <div>
+                  <p className="truncate font-semibold text-foam">{h.concepto}</p>
+                  <p className="text-xs text-mist">{h.proyecto_titulo} · {h.fecha_vencimiento}</p>
+                </div>
+                <p className="money text-sm text-expense">{money(h.monto, h.moneda_id)}</p>
+              </div>
+            </Link>
+          ))}
+        </section>
+      )}
+
+      <section className="space-y-2">
+        <SectionTitle>Por cobrar hoy</SectionTitle>
         {data.hitos_por_cobrar_hoy.length === 0 ? (
-          <EmptyRow text="Sin hitos de cobro para hoy" />
+          <Empty text="Nada por cobrar hoy" />
         ) : (
           data.hitos_por_cobrar_hoy.map((h) => (
-            <article
-              key={h.id}
-              className="rounded-xl border border-line/80 bg-panel/80 px-3 py-3"
-            >
-              <div className="flex items-start justify-between gap-3">
+            <article key={h.id} className="native-card px-3.5 py-3.5">
+              <div className="row-between">
                 <div>
-                  <p className="font-medium text-foam">{h.concepto}</p>
+                  <p className="truncate font-semibold">{h.concepto}</p>
                   <p className="text-xs text-mist">{h.proyecto_titulo}</p>
                 </div>
-                <p className="text-sm font-semibold text-income">
-                  {money(h.monto, h.moneda_id)}
-                </p>
+                <p className="money text-sm text-income">{money(h.monto, h.moneda_id)}</p>
               </div>
             </article>
           ))
@@ -94,44 +105,18 @@ export function HoyPage() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-mist">
-          Tareas críticas
-        </h2>
-        {data.tareas_pendientes.length === 0 ? (
-          <EmptyRow text="No hay tareas pendientes" />
-        ) : (
-          data.tareas_pendientes.map((t) => (
-            <article
-              key={t.id}
-              className="flex items-center justify-between rounded-xl border border-line/80 bg-panel/80 px-3 py-3"
-            >
-              <div>
-                <p className="font-medium text-foam">{t.titulo}</p>
-                <p className="text-xs capitalize text-mist">
-                  {t.prioridad} · {timeLabel(t.fecha_inicio)}
-                </p>
-              </div>
-              <span className="h-2.5 w-2.5 rounded-full bg-accent" />
-            </article>
-          ))
-        )}
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-mist">Agenda</h2>
+        <div className="flex items-center justify-between">
+          <SectionTitle>Agenda</SectionTitle>
+          <Link to="/agenda" className="text-xs font-bold text-accent">Abrir</Link>
+        </div>
         {data.eventos_del_dia.length === 0 ? (
-          <EmptyRow text="Agenda libre" />
+          <Empty text="Agenda libre" />
         ) : (
           data.eventos_del_dia.map((e) => (
-            <article
-              key={e.id}
-              className="flex gap-3 rounded-xl border border-line/80 bg-panel/80 px-3 py-3"
-            >
-              <div className="w-14 shrink-0 text-xs font-medium text-accent">
-                {timeLabel(e.fecha_inicio)}
-              </div>
+            <article key={e.id} className="native-card flex gap-3 px-3.5 py-3.5">
+              <div className="w-14 shrink-0 text-xs font-bold text-accent">{timeLabel(e.fecha_inicio)}</div>
               <div>
-                <p className="font-medium text-foam">{e.titulo}</p>
+                <p className="font-semibold">{e.titulo}</p>
                 <p className="text-xs capitalize text-mist">{e.tipo.replace('_', ' ')}</p>
               </div>
             </article>
@@ -142,26 +127,31 @@ export function HoyPage() {
   )
 }
 
-function BalanceTile({
-  label,
-  value,
-  tone,
-}: {
-  label: string
-  value: string
-  tone: string
-}) {
+function SectionTitle({ children, tone = 'text-mist' }: { children: ReactNode; tone?: string }) {
+  return <h2 className={`text-xs font-bold uppercase tracking-[0.12em] ${tone}`}>{children}</h2>
+}
+
+function Tile({ label, value, hint, tone = 'text-foam' }: { label: string; value: string; hint?: string; tone?: string }) {
   return (
-    <div className="rounded-xl border border-line/80 bg-panel/90 px-2.5 py-3">
-      <p className="text-[11px] text-mist">{label}</p>
-      <p className={`mt-1 text-sm font-semibold ${tone}`}>{value}</p>
+    <div className="native-card px-3 py-3.5">
+      <p className="text-[11px] font-semibold text-mist">{label}</p>
+      <p className={`money mt-1 text-[clamp(0.95rem,3.8vw,1.1rem)] ${tone}`}>{value}</p>
+      {hint && <p className="mt-0.5 text-[10px] text-mist">{hint}</p>}
     </div>
   )
 }
 
-function EmptyRow({ text }: { text: string }) {
+function Quick({ to, label, tone }: { to: string; label: string; tone: string }) {
   return (
-    <p className="rounded-xl border border-dashed border-line/70 px-3 py-4 text-sm text-mist">
+    <Link to={to} className={`native-btn flex items-center justify-center ${tone}`}>
+      {label}
+    </Link>
+  )
+}
+
+function Empty({ text }: { text: string }) {
+  return (
+    <p className="rounded-2xl border border-dashed border-line bg-ink-soft/60 px-3 py-5 text-center text-sm text-mist">
       {text}
     </p>
   )
