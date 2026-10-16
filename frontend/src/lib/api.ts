@@ -140,6 +140,9 @@ export const api = {
   wishlist: () => request<WishlistItem[]>('/api/wishlist'),
   createWishlist: (payload: Record<string, unknown>) =>
     request<WishlistItem>('/api/wishlist', { method: 'POST', body: JSON.stringify(payload) }),
+  updateWishlist: (id: number, payload: Record<string, unknown>) =>
+    request<WishlistItem>(`/api/wishlist/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  deleteWishlist: (id: number) => request<void>(`/api/wishlist/${id}`, { method: 'DELETE' }),
   aporteWishlist: (id: number, monto: number) =>
     request<WishlistItem>(`/api/wishlist/${id}/aporte`, {
       method: 'POST',
@@ -221,6 +224,24 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(mutaciones),
     }),
+
+  whatsapp: () => request<BorradorWhatsApp[]>('/api/whatsapp'),
+  createWhatsapp: (payload: Record<string, unknown>) =>
+    request<BorradorWhatsApp>('/api/whatsapp', { method: 'POST', body: JSON.stringify(payload) }),
+  updateWhatsapp: (id: number, payload: Record<string, unknown>) =>
+    request<BorradorWhatsApp>(`/api/whatsapp/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  deleteWhatsapp: (id: number) => request<void>(`/api/whatsapp/${id}`, { method: 'DELETE' }),
+}
+
+export interface BorradorWhatsApp {
+  id: number
+  titulo: string
+  subtitulo?: string | null
+  cuerpo: string
+  telefono?: string | null
+  mensaje_final: string
+  creado_el?: string | null
+  actualizado_el?: string | null
 }
 
 export interface IngresoFijo {

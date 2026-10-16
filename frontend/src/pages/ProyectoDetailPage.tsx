@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { cacheInvalidate, useCachedQuery } from '../lib/cache'
 import { money } from '../lib/money'
+import { estadoLabel, estadoStyle, PROYECTO_ESTADOS } from '../lib/proyectoEstado'
 import type { Hito } from '../types/api'
 
 export function ProyectoDetailPage() {
@@ -97,7 +98,12 @@ export function ProyectoDetailPage() {
       </Link>
       <header>
         <h1 className="page-title">{proyecto.titulo}</h1>
-        <p className="text-sm text-mist">
+        <p className="mt-1.5">
+          <span className={`rounded-xl border px-2 py-0.5 text-[11px] font-bold ${estadoStyle(proyecto.estado).badge}`}>
+            {estadoLabel(proyecto.estado)}
+          </span>
+        </p>
+        <p className="mt-1 text-sm text-mist">
           {proyecto.cliente_nombre || 'Sin cliente'} · {money(proyecto.presupuesto_total, proyecto.moneda_id)}
           {fromCache && refreshing ? ' · actualizando…' : ''}
         </p>
@@ -106,16 +112,16 @@ export function ProyectoDetailPage() {
       {msg && <p className="text-xs font-semibold text-income">{msg}</p>}
 
       <div className="flex flex-wrap gap-2">
-        {['propuesta', 'en_proceso', 'pausado', 'entregado', 'finalizado'].map((e) => (
+        {PROYECTO_ESTADOS.map((e) => (
           <button
             key={e}
             type="button"
             onClick={() => void setEstado(e)}
-            className={`rounded-2xl px-2.5 py-1.5 text-xs font-semibold capitalize ${
-              proyecto.estado === e ? 'bg-accent text-ink' : 'bg-ink-soft text-mist'
+            className={`rounded-2xl px-2.5 py-1.5 text-xs font-semibold ${
+              proyecto.estado === e ? estadoStyle(e).chip : 'bg-ink-soft text-mist'
             }`}
           >
-            {e.replace('_', ' ')}
+            {estadoLabel(e)}
           </button>
         ))}
       </div>

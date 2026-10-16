@@ -18,6 +18,7 @@ import { ProyectoDetailPage } from './pages/ProyectoDetailPage'
 import { ProyectosPage } from './pages/ProyectosPage'
 import { RecurrentesPage } from './pages/RecurrentesPage'
 import { ReportePage } from './pages/ReportePage'
+import { WhatsAppPage } from './pages/WhatsAppPage'
 import { WishlistPage } from './pages/WishlistPage'
 
 function RequireAuth({ children }: { children: ReactNode }) {
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="clientes" element={<ClientesPage />} />
             <Route path="agenda" element={<AgendaPage />} />
             <Route path="wishlist" element={<WishlistPage />} />
+            <Route path="whatsapp" element={<WhatsAppPage />} />
             <Route path="bitacora" element={<BitacoraPage />} />
             <Route path="ajustes" element={<AjustesPage />} />
             <Route path="transacciones/nuevo" element={<NuevaTransaccionPage />} />

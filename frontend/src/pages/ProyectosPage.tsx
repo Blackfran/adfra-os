@@ -3,9 +3,8 @@ import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
 import { cacheInvalidate, useCachedQuery } from '../lib/cache'
 import { money } from '../lib/money'
+import { estadoLabel, estadoStyle, PROYECTO_ESTADOS } from '../lib/proyectoEstado'
 import type { Cliente, Proyecto } from '../types/api'
-
-const ESTADOS = ['propuesta', 'en_proceso', 'pausado', 'entregado', 'finalizado'] as const
 
 export function ProyectosPage() {
   const [filtro, setFiltro] = useState('')
@@ -150,9 +149,9 @@ export function ProyectosPage() {
           </div>
           {editing && (
             <select value={estado} onChange={(e) => setEstado(e.target.value)} className="native-input">
-              {ESTADOS.map((e) => (
+              {PROYECTO_ESTADOS.map((e) => (
                 <option key={e} value={e}>
-                  {e.replace('_', ' ')}
+                  {estadoLabel(e)}
                 </option>
               ))}
             </select>
@@ -170,8 +169,14 @@ export function ProyectosPage() {
 
       <div className="chip-scroll">
         <Chip active={!filtro} onClick={() => setFiltro('')} label="Todos" />
-        {ESTADOS.map((e) => (
-          <Chip key={e} active={filtro === e} onClick={() => setFiltro(e)} label={e.replace('_', ' ')} />
+        {PROYECTO_ESTADOS.map((e) => (
+          <Chip
+            key={e}
+            active={filtro === e}
+            onClick={() => setFiltro(e)}
+            label={estadoLabel(e)}
+            activeClass={estadoStyle(e).chip}
+          />
         ))}
       </div>
 
@@ -180,12 +185,18 @@ export function ProyectosPage() {
           <article key={p.id} className="native-card px-3 py-3">
             <Link to={`/proyectos/${p.id}`} className="block">
               <div className="row-between">
-                <div>
+                <div className="min-w-0">
                   <p className="truncate font-semibold text-foam">{p.titulo}</p>
-                  <p className="text-xs capitalize text-mist">
-                    {p.estado.replace('_', ' ')}
-                    {p.cliente_nombre ? ` · ${p.cliente_nombre}` : ''}
-                  </p>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                    <span
+                      className={`rounded-xl border px-2 py-0.5 text-[11px] font-bold ${estadoStyle(p.estado).badge}`}
+                    >
+                      {estadoLabel(p.estado)}
+                    </span>
+                    {p.cliente_nombre ? (
+                      <span className="truncate text-xs text-mist">{p.cliente_nombre}</span>
+                    ) : null}
+                  </div>
                 </div>
                 <div className="shrink-0 text-right text-sm">
                   <p className="money text-accent">{money(p.presupuesto_total, p.moneda_id)}</p>
@@ -221,13 +232,23 @@ export function ProyectosPage() {
   )
 }
 
-function Chip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+function Chip({
+  label,
+  active,
+  onClick,
+  activeClass = 'bg-accent text-ink',
+}: {
+  label: string
+  active: boolean
+  onClick: () => void
+  activeClass?: string
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`shrink-0 rounded-2xl px-3 py-2 text-xs font-semibold capitalize ${
-        active ? 'bg-accent text-ink' : 'bg-ink-soft text-mist'
+      className={`shrink-0 rounded-2xl px-3 py-2 text-xs font-semibold ${
+        active ? activeClass : 'bg-ink-soft text-mist'
       }`}
     >
       {label}

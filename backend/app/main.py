@@ -28,6 +28,7 @@ from app.routers import (
     sync,
     telegram,
     transacciones,
+    whatsapp,
     wishlist,
 )
 from app.seed import seed_extras_if_missing, seed_if_empty
@@ -134,6 +135,7 @@ app.include_router(presupuestos.router)
 app.include_router(monedas.router)
 app.include_router(reportes.router)
 app.include_router(telegram.router)
+app.include_router(whatsapp.router)
 
 
 @app.get("/api/health")

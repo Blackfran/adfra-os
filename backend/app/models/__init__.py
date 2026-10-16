@@ -1,6 +1,7 @@
 from app.models.entities import (
     AgendaEvento,
     BitacoraNota,
+    BorradorWhatsApp,
     CategoriaFinanciera,
     Cliente,
     CobroHito,
@@ -30,4 +31,5 @@ __all__ = [
     "GastoRecurrente",
     "IngresoRecurrente",
     "PresupuestoMensual",
+    "BorradorWhatsApp",
 ]

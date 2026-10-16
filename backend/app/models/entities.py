@@ -213,3 +213,19 @@ class IngresoRecurrente(Base):
     notas: Mapped[str | None] = mapped_column(Text)
 
 
+class BorradorWhatsApp(Base):
+    """Borradores de mensajes listos para WhatsApp (formato *negrita* _cursiva_ etc.)."""
+
+    __tablename__ = "borradores_whatsapp"
+
+    id: Mapped[int] = mapped_column(PK, primary_key=True, autoincrement=True)
+    titulo: Mapped[str] = mapped_column(String(150), nullable=False)
+    subtitulo: Mapped[str | None] = mapped_column(String(200))
+    cuerpo: Mapped[str] = mapped_column(Text, nullable=False)
+    telefono: Mapped[str | None] = mapped_column(String(30))
+    creado_el: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    actualizado_el: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), onupdate=func.now()
+    )
+
+

@@ -194,15 +194,30 @@ textarea {
 
 .chip-scroll {
   display: flex;
+  flex-wrap: nowrap;
   gap: 0.5rem;
   overflow-x: auto;
-  padding-bottom: 0.25rem;
+  overflow-y: hidden;
+  padding-bottom: 0.35rem;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  touch-action: pan-x;
+  scrollbar-width: thin;
+  scrollbar-color: #d4c8e8 transparent;
 }
 
 .chip-scroll::-webkit-scrollbar {
-  display: none;
+  height: 4px;
+}
+
+.chip-scroll::-webkit-scrollbar-thumb {
+  background: #d4c8e8;
+  border-radius: 999px;
+}
+
+.chip-scroll > * {
+  flex: 0 0 auto;
 }
 
 .native-card {
@@ -235,6 +250,63 @@ textarea {
   border-radius: 0.875rem;
   font-weight: 600;
   font-size: 0.95rem;
+}
+
+/* Vista previa estilo chat WhatsApp */
+.wa-chat-bg {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(37, 211, 102, 0.08), transparent 40%),
+    #efeae2;
+}
+
+.wa-bubble {
+  border-radius: 0.85rem 0.85rem 0.2rem 0.85rem;
+  background: #fff;
+  padding: 0.55rem 0.7rem 0.35rem;
+  box-shadow: 0 1px 1px rgba(11, 20, 26, 0.08);
+}
+
+.wa-bubble-text {
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: #111b21;
+  word-break: break-word;
+}
+
+.wa-bubble-text strong {
+  font-weight: 700;
+}
+
+.wa-bubble-text em {
+  font-style: italic;
+}
+
+.wa-bubble-text s {
+  text-decoration: line-through;
+  opacity: 0.85;
+}
+
+.wa-bubble-text .wa-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  background: rgba(11, 20, 26, 0.06);
+  border-radius: 0.3rem;
+  padding: 0.05rem 0.25rem;
+}
+
+.wa-bubble-text .wa-quote {
+  display: block;
+  border-left: 3px solid #25d366;
+  padding-left: 0.5rem;
+  margin: 0.2rem 0;
+  color: #3b4a54;
+}
+
+.wa-time {
+  margin-top: 0.35rem;
+  text-align: right;
+  font-size: 0.65rem;
+  color: #667781;
 }
 
 @media (min-width: 768px) {

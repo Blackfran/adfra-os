@@ -15,6 +15,7 @@ const moreLinks = [
   { to: '/reporte', label: 'Reporte mensual', desc: 'Cierre y neto' },
   { to: '/clientes', label: 'Clientes', desc: 'Directorio' },
   { to: '/wishlist', label: 'Wishlist', desc: 'Metas de ahorro' },
+  { to: '/whatsapp', label: 'WhatsApp', desc: 'Borradores con formato' },
   { to: '/bitacora', label: 'Bitácora', desc: 'Notas rápidas' },
   { to: '/ajustes', label: 'Ajustes', desc: 'Tasas y preferencias' },
 ] as const

@@ -10,6 +10,7 @@ TABLES = [
     "cobros_hitos",
     "agenda_eventos",
     "bitacora_notas",
+    "borradores_whatsapp",
     "wishlist",
     "presupuestos_mensuales",
     "gastos_recurrentes",
