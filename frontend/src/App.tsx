@@ -7,6 +7,7 @@ import { AgendaPage } from './pages/AgendaPage'
 import { AjustesPage } from './pages/AjustesPage'
 import { BitacoraPage } from './pages/BitacoraPage'
 import { ClientesPage } from './pages/ClientesPage'
+import { ComprasPage } from './pages/ComprasPage'
 import { CuentasPage } from './pages/CuentasPage'
 import { FinanzasPage } from './pages/FinanzasPage'
 import { HoyPage } from './pages/HoyPage'
@@ -58,6 +59,7 @@ export default function App() {
             <Route path="clientes" element={<ClientesPage />} />
             <Route path="agenda" element={<AgendaPage />} />
             <Route path="wishlist" element={<WishlistPage />} />
+            <Route path="compras" element={<ComprasPage />} />
             <Route path="whatsapp" element={<WhatsAppPage />} />
             <Route path="bitacora" element={<BitacoraPage />} />
             <Route path="ajustes" element={<AjustesPage />} />

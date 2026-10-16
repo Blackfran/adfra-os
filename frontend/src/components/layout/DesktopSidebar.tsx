@@ -11,6 +11,7 @@ const links = [
   { to: '/clientes', label: 'Clientes' },
   { to: '/agenda', label: 'Agenda' },
   { to: '/wishlist', label: 'Wishlist' },
+  { to: '/compras', label: 'Compras' },
   { to: '/whatsapp', label: 'WhatsApp' },
   { to: '/bitacora', label: 'Bitácora' },
   { to: '/ajustes', label: 'Ajustes' },

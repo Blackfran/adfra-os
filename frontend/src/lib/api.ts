@@ -217,6 +217,12 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify({ tasa_referencia }),
     }),
+  actualizarTasasVivas: () =>
+    request<{
+      actualizadas: string[]
+      cotizaciones_bs: Record<string, number>
+      mensaje: string
+    }>('/api/monedas/actualizar-vivas', { method: 'POST' }),
 
   search: (q: string) => request<{ results: SearchHit[] }>(`/api/search?q=${encodeURIComponent(q)}`),
   sync: (mutaciones: SyncMutation[]) =>

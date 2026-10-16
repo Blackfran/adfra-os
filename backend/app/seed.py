@@ -15,6 +15,7 @@ def seed_if_empty(db: Session) -> None:
                 Moneda(id="USD", nombre="Dólar estadounidense", simbolo="$", tasa_referencia=Decimal("1")),
                 Moneda(id="VES", nombre="Bolívar digital", simbolo="Bs", tasa_referencia=Decimal("36.5")),
                 Moneda(id="EUR", nombre="Euro", simbolo="€", tasa_referencia=Decimal("0.92")),
+                Moneda(id="BIN", nombre="USDT Binance", simbolo="₮", tasa_referencia=Decimal("1")),
             ]
         )
 
@@ -35,5 +36,11 @@ def seed_if_empty(db: Session) -> None:
 
 
 def seed_extras_if_missing(db: Session) -> None:
-    """Ya no crea cuentas/fijos de demostración."""
-    return
+    """Monedas nuevas en bases ya existentes (sin datos demo)."""
+    bin_row = db.get(Moneda, "BIN")
+    if not bin_row:
+        db.add(Moneda(id="BIN", nombre="USDT Binance", simbolo="₮", tasa_referencia=Decimal("1")))
+        db.commit()
+    elif bin_row.nombre != "USDT Binance":
+        bin_row.nombre = "USDT Binance"
+        db.commit()

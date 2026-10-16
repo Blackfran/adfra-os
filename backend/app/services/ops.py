@@ -24,10 +24,11 @@ def _tasa(db: Session, moneda_id: str) -> Decimal:
 
 
 def to_usd(db: Session, monto: Decimal, moneda_id: str) -> Decimal:
-    if moneda_id == "USD":
+    # USDT (BIN) se trata 1:1 con USD; su tasa_referencia guarda Bs/USDT solo para cotización
+    if moneda_id in ("USD", "BIN"):
         return Decimal(monto)
     tasa = _tasa(db, moneda_id)
-    # tasa_referencia = units of currency per 1 USD (VES=36.5 means 36.5 VES = 1 USD)
+    # tasa_referencia = unidades de esa moneda por 1 USD (VES = Bs por 1 USD BCV)
     return Decimal(monto) / tasa if tasa else Decimal(monto)
 
 
